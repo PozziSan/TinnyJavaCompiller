@@ -2,8 +2,8 @@
 A tinny Compiller written in Java for the Compiler and Theory of Computing Discipline at University.
 
 
-#JDK:
+# JDK:
 Oracle JDK 11
 
-#IDE:
+# IDE:
 Eclipse Photon 2018-09

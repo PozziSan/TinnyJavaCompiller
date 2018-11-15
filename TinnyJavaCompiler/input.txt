@@ -1,0 +1,3 @@
+int teste, valor, alto, tipo, raphax;
+
+float preco;

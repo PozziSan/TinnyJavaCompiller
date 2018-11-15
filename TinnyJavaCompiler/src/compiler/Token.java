@@ -11,5 +11,7 @@ public enum Token {
 	ARGUMENT_SEPARATOR,
 	IF,
 	ELSE,
-	DO
+	DO,
+	WHILE,
+	DOWHILE
 }

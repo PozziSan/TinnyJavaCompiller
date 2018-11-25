@@ -2,6 +2,7 @@ package teste;
 
 import java.math;
 import java.io;
+import compilador.lexer;
 
 public class Teste {
 
@@ -10,27 +11,31 @@ public class Teste {
     public char nome;
 
     public void inicio(){
+        int idade = 20;
         teste = 1;
         valor = 5;
         int total = teste + valor;
-    }
-
-    public float somaTemperatura(float temperatura)`{
-        return temperatura + this.temperatura;`
+        int total2 = total * valor + teste / 123 - temperatura + teste * 44;
     }
 
     public void blocos(){
         if ( 1 == 2){
+            if (teste == 0){
+                if (valor == temperatura){
+                    teste = teste + 1;
+                }
+            }
+        }
 
+        while (teste > 0){
+            if (temperatura > 0){
+                teste = teste -1;
+            }
         }
 
         do {
+            nome = 25;
+        } while ( 1 == 2);
 
-        } while ( 1 ==2);
-
-        for (int i = 0; i < 10; i++){
-
-        }
     }
-
 }

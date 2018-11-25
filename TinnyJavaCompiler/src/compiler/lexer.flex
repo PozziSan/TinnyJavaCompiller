@@ -72,6 +72,11 @@ do           {
                     return new Token(TipoToken.OPERADOR_ARITMETICO, yytext(), yyline);
                }
 
+"<=" | ">=" | "==" | "<" | ">" | "!="
+               {
+                    return new Token(TipoToken.OPERADOR_RELACIONAL, yytext(), yyline);
+               }
+
 [({]       {
                     return new Token(TipoToken.ABRE_BLOCO, yytext(), yyline);
                }

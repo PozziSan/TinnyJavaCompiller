@@ -37,7 +37,8 @@ public class Parser {
 			System.out.println("Esperado: " + esperado);
 			System.out.println("Obtido: " + tokenLido.getTipo() + " Lexema: " + tokenLido.getLexema());
 			System.out.println("Erro na linha: " + tokenLido.getLinha());
-			System.exit(0);
+			throw new NullPointerException();
+			//System.exit(0);
 		}
 	}
 
@@ -94,45 +95,120 @@ public class Parser {
     */
 	private void metodos() throws IOException
 	{
-		if(tokenLido.getTipo() == TipoToken.IDENTIFICADOR)
-		{
-			if(!as.existeVariavel(tokenLido.getLexema()))
-			{
-				System.out.println("ERRO SEMANTICO!");
-				System.out.println("Variável não declarada: " + tokenLido.getLexema());
-				System.out.println("Linha: " + tokenLido.getLinha());
-				System.exit(0);
-			}
-			match(TipoToken.IDENTIFICADOR);
-			// match atribuição
-			//   expressao();
+		//Public void metodo(){}
+
+		if (tokenLido.getTipo() == TipoToken.FECHA_BLOCO)
+			return;
+
+		if (tokenLido.getTipo() == TipoToken.MODIFICADOR){
+			match(TipoToken.MODIFICADOR);
 		}
 
-		if(tokenLido.getTipo()== TipoToken.IF ||
-				tokenLido.getTipo()==TipoToken.WHILE ||
-				tokenLido.getTipo()== TipoToken.DO ||
-		        tokenLido.getTipo() == TipoToken.FOR)
-		{
-				bloco();
+		if (tokenLido.getTipo() == TipoToken.NOME_RESERVADO){
+			match(TipoToken.NOME_RESERVADO);
+		} else {
+			match(TipoToken.TIPO_DADO);
 		}
+
+		match(TipoToken.IDENTIFICADOR);
+		match(TipoToken.ABRE_BLOCO);
+		match(TipoToken.FECHA_BLOCO);
+		match(TipoToken.ABRE_BLOCO);
+		bloco();
+		match(TipoToken.FECHA_BLOCO);
+		//Método não está aceitando parâmetros
+
+		metodos();
 	}
 
-	private void bloco(){
-		if (tokenLido.getTipo() == TipoToken.IF){
+	private void bloco() throws IOException {
 
+		if (tokenLido.getTipo() == TipoToken.FECHA_BLOCO)
+			return;
+
+		if(tokenLido.getTipo() == TipoToken.IDENTIFICADOR) {
+			identificadorExistente();
+			if (tokenLido.getTipo() == TipoToken.SEPARADOR_COMANDO)
+				match(TipoToken.SEPARADOR_COMANDO);
+			else {
+				match(TipoToken.ATRIBUICAO);
+				operacao();
+				match(TipoToken.SEPARADOR_COMANDO);
+			}
+		}
+
+		declaracoesVariaveis();
+
+		if (tokenLido.getTipo() == TipoToken.IF){
+			match(TipoToken.IF);
+			condicao();
+			match(TipoToken.ABRE_BLOCO);
+			bloco();
+			match(TipoToken.FECHA_BLOCO);
 		}
 
 		if (tokenLido.getTipo() == TipoToken.WHILE){
-
+			match(TipoToken.WHILE);
+			condicao();
+			match(TipoToken.ABRE_BLOCO);
+			bloco();
+			match(TipoToken.FECHA_BLOCO);
 		}
 
 		if (tokenLido.getTipo() == TipoToken.DO){
-
+			match(TipoToken.DO);
+			match(TipoToken.ABRE_BLOCO);
+			bloco();
+			match(TipoToken.FECHA_BLOCO);
+			match(TipoToken.WHILE);
+			condicao();
+			match(TipoToken.SEPARADOR_COMANDO);
 		}
 
 		if (tokenLido.getTipo() == TipoToken.FOR){
-
+			//FOR Não implementado
 		}
+
+		bloco();
+	}
+
+	private void operacao() throws IOException {
+
+		valorValido();
+		if (tokenLido.getTipo() == TipoToken.OPERADOR_ARITMETICO){
+			match(TipoToken.OPERADOR_ARITMETICO);
+			operacao();
+		}
+
+	}
+
+	private void valorValido() throws IOException {
+		if (tokenLido.getTipo() == TipoToken.IDENTIFICADOR){
+			identificadorExistente();
+		} else {
+			match(TipoToken.CONSTANTE_INTEIRA);
+		}
+	}
+
+	private void identificadorExistente() throws IOException {
+		if(!as.existeVariavel(tokenLido.getLexema()))
+		{
+			System.out.println("ERRO SEMANTICO!");
+			System.out.println("Variável não declarada: " + tokenLido.getLexema());
+			System.out.println("Linha: " + tokenLido.getLinha());
+			System.exit(0);
+		}
+		match(TipoToken.IDENTIFICADOR);
+		// match atribuição
+		//   expressao();
+	}
+
+	private void condicao() throws IOException {
+		match(TipoToken.ABRE_BLOCO);
+		valorValido();
+		match(TipoToken.OPERADOR_RELACIONAL);
+		valorValido();
+		match(TipoToken.FECHA_BLOCO);
 	}
 
 	/*  declaracoesVariaveis -> <tipo> <id> listaVar
@@ -143,7 +219,12 @@ public class Parser {
 		if (tokenLido.getTipo() == TipoToken.MODIFICADOR){
 			match(TipoToken.MODIFICADOR);
 		}
+
+		if (tokenLido.getTipo() != TipoToken.TIPO_DADO)
+			return;
+
 		match(TipoToken.TIPO_DADO);
+
 		if(as.existeVariavel(tokenLido.getLexema())) {
 			System.out.println("ERRO SEMANTICO!");
 			System.out.println("Variável previamente declarada: " + tokenLido.getLexema());
@@ -156,8 +237,11 @@ public class Parser {
 		match(TipoToken.IDENTIFICADOR);
 		if (tokenLido.getTipo() == TipoToken.ATRIBUICAO){
 			match(TipoToken.ATRIBUICAO);
-			match(TipoToken.CONSTANTE_INTEIRA);
+			operacao();
 			//Não implementado outros tipos de atribuição!
+			match(TipoToken.SEPARADOR_COMANDO);
+			declaracoesVariaveis();
+			return;
 		}
 		listaVar();
 	}

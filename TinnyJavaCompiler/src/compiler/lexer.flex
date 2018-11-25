@@ -1,4 +1,4 @@
-package compilador;
+package compiler;
 %%
 %class Lexer
 %{
@@ -7,42 +7,97 @@ package compilador;
     System.out.println("Fim de arquivo!!!");
     System.exit(0);
 %eof}
+%function getToken
+%type Token
 %%
 
 
+package      {
+                    return new Token(TipoToken.PACOTE, yytext(), yyline);
+             }
 
-"int" | "float" | "double" | "char"   
+import       {
+                    return new Token(TipoToken.IMPORT, yytext(), yyline);
+             }
+
+class       {
+                    return new Token(TipoToken.CLASSE, yytext(), yyline);
+             }
+
+"static" | "void"
              {
-                    return new Yytoken(Token.TIPO_DADO, yytext());
+                    return new Token(TipoToken.NOME_RESERVADO, yytext(), yyline);
+             }
+
+"int" | "float" | "double" | "char" | "String"
+             {
+                    return new Token(TipoToken.TIPO_DADO, yytext(), yyline);
+             }
+
+"public" | "private" | "protected"
+             {
+                    return new Token(TipoToken.MODIFICADOR, yytext(), yyline);
              }
 
 if           {
-                    return new Yytoken(Token.IF, yytext());
+                    return new Token(TipoToken.IF, yytext(), yyline);
              }
 
+else         {
+                    return new Token(TipoToken.ELSE, yytext(), yyline);
+             }
+
+for          {
+                    return new Token(TipoToken.FOR, yytext(), yyline);
+             }
+
+while        {
+                    return new Token(TipoToken.WHILE, yytext(), yyline);
+             }
+
+do           {
+                    return new Token(TipoToken.DO, yytext(), yyline);
+             }
+
+\p{letter}\w*\.\p{letter}\w*(\.\w*)*
+               {
+                    return new Token(TipoToken.IDENTIFICADOR_COMPOSTO, yytext(), yyline);
+               }
+
 \p{letter}\w*  {
-                    return new Yytoken(Token.IDENTIFICADOR, yytext());
+                    return new Token(TipoToken.IDENTIFICADOR, yytext(), yyline);
                }
 
 [+\-*/%]       {
-                    return new Yytoken(Token.OPERADOR_ARITMETICO, yytext());
+                    return new Token(TipoToken.OPERADOR_ARITMETICO, yytext(), yyline);
+               }
+
+[({]       {
+                    return new Token(TipoToken.ABRE_BLOCO, yytext(), yyline);
+               }
+
+[)}]       {
+                    return new Token(TipoToken.FECHA_BLOCO, yytext(), yyline);
                }
 
 \d(\d)*        {
-                    return new Yytoken(Token.CONSTANTE_INTEIRA, yytext());
+                    return new Token(TipoToken.CONSTANTE_INTEIRA, yytext(), yyline);
                }
 
 =              {
-                    return new Yytoken(Token.ATRIBUICAO, yytext());
+                    return new Token(TipoToken.ATRIBUICAO, yytext(), yyline);
                }
 
 ;              {
-                    return new Yytoken(Token.SEPARADOR_COMANDO, yytext());
+                    return new Token(TipoToken.SEPARADOR_COMANDO, yytext(), yyline);
                }
 
 ,              {
-                    return new Yytoken(Token.SEPARADOR_ARGUMENTO, yytext());
+                    return new Token(TipoToken.SEPARADOR_ARGUMENTO, yytext(), yyline);
                }
-\n | \r | \r\n {}  // Ignora quebra de linha.
+\n | \r | \r\n
+{
+    yyline++;
+}  // Ignora quebra de linha.
 
 . {}   // Qualquer caractere ignorar.

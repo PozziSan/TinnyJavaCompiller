@@ -1,3 +1,36 @@
-int teste, valor, alto, tipo, raphax;
+package teste;
 
-float preco;
+import java.math;
+import java.io;
+
+public class Teste {
+
+    private int teste, valor;
+    private float temperatura = 0;
+    public char nome;
+
+    public void inicio(){
+        teste = 1;
+        valor = 5;
+        int total = teste + valor;
+    }
+
+    public float somaTemperatura(float temperatura)`{
+        return temperatura + this.temperatura;`
+    }
+
+    public void blocos(){
+        if ( 1 == 2){
+
+        }
+
+        do {
+
+        } while ( 1 ==2);
+
+        for (int i = 0; i < 10; i++){
+
+        }
+    }
+
+}

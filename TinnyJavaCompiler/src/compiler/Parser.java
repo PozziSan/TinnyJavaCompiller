@@ -37,8 +37,7 @@ public class Parser {
 			System.out.println("Esperado: " + esperado);
 			System.out.println("Obtido: " + tokenLido.getTipo() + " Lexema: " + tokenLido.getLexema());
 			System.out.println("Erro na linha: " + tokenLido.getLinha());
-			throw new NullPointerException();
-			//System.exit(0);
+			System.exit(0);
 		}
 	}
 
@@ -111,8 +110,8 @@ public class Parser {
 		}
 
 		match(TipoToken.IDENTIFICADOR);
-		match(TipoToken.ABRE_BLOCO);
-		match(TipoToken.FECHA_BLOCO);
+		match(TipoToken.ABRE_PARENTESIS);
+		match(TipoToken.FECHA_PARENTESIS);
 		match(TipoToken.ABRE_BLOCO);
 		bloco();
 		match(TipoToken.FECHA_BLOCO);
@@ -125,6 +124,11 @@ public class Parser {
 
 		if (tokenLido.getTipo() == TipoToken.FECHA_BLOCO)
 			return;
+
+		if (tokenLido.getTipo() == TipoToken.INCREMENTO_IDENTIFICADOR) {
+			match(TipoToken.INCREMENTO_IDENTIFICADOR);
+			match(TipoToken.SEPARADOR_COMANDO);
+		}
 
 		if(tokenLido.getTipo() == TipoToken.IDENTIFICADOR) {
 			identificadorExistente();
@@ -141,7 +145,7 @@ public class Parser {
 
 		if (tokenLido.getTipo() == TipoToken.IF){
 			match(TipoToken.IF);
-			condicao();
+			condicao(true);
 			match(TipoToken.ABRE_BLOCO);
 			bloco();
 			match(TipoToken.FECHA_BLOCO);
@@ -149,7 +153,7 @@ public class Parser {
 
 		if (tokenLido.getTipo() == TipoToken.WHILE){
 			match(TipoToken.WHILE);
-			condicao();
+			condicao(true);
 			match(TipoToken.ABRE_BLOCO);
 			bloco();
 			match(TipoToken.FECHA_BLOCO);
@@ -161,12 +165,37 @@ public class Parser {
 			bloco();
 			match(TipoToken.FECHA_BLOCO);
 			match(TipoToken.WHILE);
-			condicao();
+			condicao(true);
 			match(TipoToken.SEPARADOR_COMANDO);
 		}
 
 		if (tokenLido.getTipo() == TipoToken.FOR){
-			//FOR Não implementado
+			match(TipoToken.FOR);
+			match(TipoToken.ABRE_PARENTESIS);
+			match(TipoToken.TIPO_DADO);
+			if (as.existeVariavel(tokenLido.getLexema()))
+			{
+				System.out.println("ERRO SEMANTICO!");
+				System.out.println("Variável previamente declarada: " + tokenLido.getLexema());
+				System.out.println("Linha: " + tokenLido.getLinha());
+				System.exit(0);
+			}
+			as.adicionaVariavel(tokenLido);
+			match(TipoToken.IDENTIFICADOR);
+			match(TipoToken.ATRIBUICAO);
+			valorValido();
+			match(TipoToken.SEPARADOR_COMANDO);
+			condicao(false);
+			match(TipoToken.SEPARADOR_COMANDO);
+			if (tokenLido.getTipo() == TipoToken.INCREMENTO_IDENTIFICADOR)
+				match(TipoToken.INCREMENTO_IDENTIFICADOR);
+			else {
+				operacao();
+			}
+			match(TipoToken.FECHA_PARENTESIS);
+			match(TipoToken.ABRE_BLOCO);
+			bloco();
+			match(TipoToken.FECHA_BLOCO);
 		}
 
 		bloco();
@@ -203,17 +232,16 @@ public class Parser {
 		//   expressao();
 	}
 
-	private void condicao() throws IOException {
-		match(TipoToken.ABRE_BLOCO);
+	private void condicao(boolean exigeParentesis) throws IOException {
+		if (exigeParentesis)
+			match(TipoToken.ABRE_PARENTESIS);
 		valorValido();
 		match(TipoToken.OPERADOR_RELACIONAL);
 		valorValido();
-		match(TipoToken.FECHA_BLOCO);
+		if (exigeParentesis)
+			match(TipoToken.FECHA_PARENTESIS);
 	}
 
-	/*  declaracoesVariaveis -> <tipo> <id> listaVar
-        listaVar -> <,> <id> listaVar | <;>
-    */
 	private void declaracoesVariaveis() throws IOException
 	{
 		if (tokenLido.getTipo() == TipoToken.MODIFICADOR){

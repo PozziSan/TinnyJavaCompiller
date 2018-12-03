@@ -5,7 +5,6 @@ package compiler;
 %}
 %eof{
     System.out.println("Fim de arquivo!!!");
-    System.exit(0);
 %eof}
 %function getToken
 %type Token
@@ -64,6 +63,10 @@ do           {
                     return new Token(TipoToken.IDENTIFICADOR_COMPOSTO, yytext(), yyline);
                }
 
+\p{letter}\w*"++"  {
+                    return new Token(TipoToken.INCREMENTO_IDENTIFICADOR, yytext(), yyline);
+               }
+
 \p{letter}\w*  {
                     return new Token(TipoToken.IDENTIFICADOR, yytext(), yyline);
                }
@@ -77,12 +80,20 @@ do           {
                     return new Token(TipoToken.OPERADOR_RELACIONAL, yytext(), yyline);
                }
 
-[({]       {
+"{"       {
                     return new Token(TipoToken.ABRE_BLOCO, yytext(), yyline);
                }
 
-[)}]       {
+"}"       {
                     return new Token(TipoToken.FECHA_BLOCO, yytext(), yyline);
+               }
+
+"("       {
+                    return new Token(TipoToken.ABRE_PARENTESIS, yytext(), yyline);
+               }
+
+")"       {
+                    return new Token(TipoToken.FECHA_PARENTESIS, yytext(), yyline);
                }
 
 \d(\d)*        {

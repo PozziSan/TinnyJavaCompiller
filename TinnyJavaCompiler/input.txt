@@ -16,6 +16,7 @@ public class Teste {
         valor = 5;
         int total = teste + valor;
         int total2 = total * valor + teste / 123 - temperatura + teste * 44;
+        teste++;
     }
 
     public void blocos(){
@@ -31,6 +32,10 @@ public class Teste {
             if (temperatura > 0){
                 teste = teste -1;
             }
+        }
+
+        for (int yy = 0; yy < 10; yy++){
+            teste++;
         }
 
         do {

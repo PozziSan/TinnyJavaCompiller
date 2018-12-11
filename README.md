@@ -25,4 +25,4 @@ A tinny Compiller written in Java for the Compiler and Theory of Computing Disci
 Oracle JDK 8
 
 # IDE:
-IntelliJ
+Eclipse 2018-09 @PozziSan | IntelliJ @ViniMoraes
